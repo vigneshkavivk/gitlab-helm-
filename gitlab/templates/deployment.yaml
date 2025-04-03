@@ -1,34 +1,66 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gitlab
+  name: {{ .Chart.Name }}-rails
   labels:
-    app: gitlab
+    app: {{ .Chart.Name }}
+    component: rails
 spec:
-  replicas: 1
+  replicas: {{ .Values.gitlab.rails.replicas }}
   selector:
     matchLabels:
-      app: gitlab
+      app: {{ .Chart.Name }}
+      component: rails
   template:
     metadata:
       labels:
-        app: gitlab
+        app: {{ .Chart.Name }}
+        component: rails
     spec:
       containers:
-      - name: gitlab
-        image: gitlab/gitlab-ce:15.0.0-ce.0
+      - name: gitlab-rails
+        image: "{{ .Values.gitlab.rails.image.repository }}:{{ .Values.gitlab.rails.image.tag }}"
+        imagePullPolicy: {{ .Values.gitlab.rails.image.pullPolicy }}
         envFrom:
         - configMapRef:
-            name: gitlab-config
-        - secretRef:
-            name: gitlab-secrets
+            name: {{ .Chart.Name }}-config
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Chart.Name }}-secrets
+              key: postgres-password
+        - name: DB_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Chart.Name }}-secrets
+              key: db-key-base
+        - name: SECRET_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Chart.Name }}-secrets
+              key: secret-key-base
+        - name: OTP_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Chart.Name }}-secrets
+              key: otp-key-base
+        resources:
+          {{- toYaml .Values.gitlab.rails.resources | nindent 10 }}
         ports:
-        - containerPort: 80
+        - containerPort: 8080
           name: http
-        - containerPort: 443
-          name: https
-        - containerPort: 22
-          name: ssh
+        volumeMounts:
+        - name: gitlab-data
+          mountPath: /var/opt/gitlab
+        - name: gitlab-config
+          mountPath: /etc/gitlab
+      - name: gitlab-workhorse
+        image: "{{ .Values.gitlab.rails.workhorse.image.repository }}:{{ .Values.gitlab.rails.workhorse.image.tag }}"
+        imagePullPolicy: {{ .Values.gitlab.rails.image.pullPolicy }}
+        ports:
+        - containerPort: 8181
+          name: workhorse
         volumeMounts:
         - name: gitlab-data
           mountPath: /var/opt/gitlab
@@ -37,7 +69,68 @@ spec:
       volumes:
       - name: gitlab-data
         persistentVolumeClaim:
-          claimName: gitlab-pvc
+          claimName: {{ .Chart.Name }}-pvc
       - name: gitlab-config
-        configMap:
-          name: gitlab-config
+        emptyDir: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-sidekiq
+  labels:
+    app: {{ .Chart.Name }}
+    component: sidekiq
+spec:
+  replicas: {{ .Values.sidekiq.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      component: sidekiq
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        component: sidekiq
+    spec:
+      containers:
+      - name: sidekiq
+        image: "{{ .Values.sidekiq.image.repository }}:{{ .Values.sidekiq.image.tag }}"
+        imagePullPolicy: {{ .Values.sidekiq.image.pullPolicy }}
+        envFrom:
+        - configMapRef:
+            name: {{ .Chart.Name }}-config
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Chart.Name }}-secrets
+              key: postgres-password
+        - name: DB_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Chart.Name }}-secrets
+              key: db-key-base
+        - name: SECRET_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Chart.Name }}-secrets
+              key: secret-key-base
+        - name: OTP_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Chart.Name }}-secrets
+              key: otp-key-base
+        resources:
+          {{- toYaml .Values.sidekiq.resources | nindent 10 }}
+        volumeMounts:
+        - name: gitlab-data
+          mountPath: /var/opt/gitlab
+        - name: gitlab-config
+          mountPath: /etc/gitlab
+      volumes:
+      - name: gitlab-data
+        persistentVolumeClaim:
+          claimName: {{ .Chart.Name }}-pvc
+      - name: gitlab-config
+        emptyDir: {}
