@@ -1,14 +1,15 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: gitlab-pv
+  name: {{ .Chart.Name }}-pv
+  labels:
+    app: {{ .Chart.Name }}
 spec:
   capacity:
-    storage: 10Gi
+    storage: {{ .Values.persistence.size }}
   accessModes:
-    - ReadWriteOnce
+    - {{ .Values.persistence.accessMode }}
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: gp2
-  awsElasticBlockStore:
-    volumeID: <your-ebs-volume-id>  # Replace with your EBS volume ID
-    fsType: ext4
+  storageClassName: {{ .Values.persistence.storageClass | default "" }}
+  hostPath:
+    path: /data/{{ .Chart.Name }}
