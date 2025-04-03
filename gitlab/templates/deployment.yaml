@@ -2,93 +2,42 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gitlab
+  labels:
+    app: gitlab
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       app: gitlab
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
         app: gitlab
     spec:
-      securityContext:
-        fsGroup: 1000  # Ensures GitLab can access mounted volumes
-
-      initContainers:
-        - name: init
-          image: busybox:1.35
-          command:
-            - "sh"
-            - "-c"
-            - |
-              chown -R 1000:1000 /var/opt/gitlab /etc/gitlab /var/log/gitlab
-              chmod -R 755 /var/opt/gitlab /etc/gitlab /var/log/gitlab
-          volumeMounts:
-            - name: gitlab-storage
-              mountPath: /var/opt/gitlab
-            - name: gitlab-config
-              mountPath: /etc/gitlab
-            - name: gitlab-logs
-              mountPath: /var/log/gitlab
-
       containers:
-        - name: gitlab
-          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-          ports:
-            - containerPort: 80
-          env:
-            - name: GITLAB_OMNIBUS_CONFIG
-              value: |
-                external_url 'http://{{ first .Values.ingress.hosts }}'
-                gitlab_rails['db_host'] = '{{ .Values.database.host }}'
-                gitlab_rails['db_port'] = {{ .Values.database.port }}
-                gitlab_rails['db_username'] = '{{ .Values.database.user }}'
-                gitlab_rails['db_password'] = '{{ .Values.database.password }}'
-                gitlab_rails['db_database'] = '{{ .Values.database.dbname }}'
-                gitlab_rails['db_adapter'] = 'postgresql'
-                gitlab_rails['db_encoding'] = 'unicode'
-                gitlab_rails['boot_timeout'] = 1200  # Increased to 20 minutes
-                puma['worker_timeout'] = 600
-          resources:
-            requests:
-              memory: "4Gi"
-              cpu: "1"
-            limits:
-              memory: "8Gi"
-              cpu: "2"
-          livenessProbe:
-            httpGet:
-              path: /-/health
-              port: 80
-            initialDelaySeconds: 600
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /-/readiness
-              port: 80
-            initialDelaySeconds: 300
-            periodSeconds: 10
-          volumeMounts:
-            - name: gitlab-storage
-              mountPath: /var/opt/gitlab
-            - name: gitlab-config
-              mountPath: /etc/gitlab
-            - name: gitlab-logs
-              mountPath: /var/log/gitlab
-
-      volumes:
-        - name: gitlab-storage
-          persistentVolumeClaim:
-            claimName: gitlab-pvc
+      - name: gitlab
+        image: gitlab/gitlab-ce:15.0.0-ce.0
+        envFrom:
+        - configMapRef:
+            name: gitlab-config
+        - secretRef:
+            name: gitlab-secrets
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        - containerPort: 22
+          name: ssh
+        volumeMounts:
+        - name: gitlab-data
+          mountPath: /var/opt/gitlab
         - name: gitlab-config
-          persistentVolumeClaim:
-            claimName: gitlab-config-pvc
-        - name: gitlab-logs
-          persistentVolumeClaim:
-            claimName: gitlab-logs-pvc
+          mountPath: /etc/gitlab
+      volumes:
+      - name: gitlab-data
+        persistentVolumeClaim:
+          claimName: gitlab-pvc
+      - name: gitlab-config
+        configMap:
+          name: gitlab-config
