@@ -6,7 +6,8 @@ spec:
   capacity:
     storage: {{ .Values.storage.size }}
   accessModes:
-    - {{ .Values.storage.accessModes }}  # Fixed: Now properly formatted as array item
+    accessModes:
+{{ toYaml .Values.storage.accessModes | indent 2 }}  # Properly handles single or multiple values # Fixed: Now properly formatted as array item
   persistentVolumeReclaimPolicy: Retain
   storageClassName: {{ .Values.storage.storageClassName }}
   hostPath:
