@@ -74,9 +74,7 @@ ingress:
   enabled: true
   className: ""
   annotations: {}
-  hosts:
-    - host: gitlab.example.com
-      paths:
-        - path: /
-          pathType: Prefix
+  host: gitlab.example.com  # Changed from hosts array to single host
+  path: /
+  pathType: Prefix
   tls: []
