@@ -24,7 +24,10 @@ spec:
                 gitlab_rails['db_port'] = {{ .Values.postgresql.port }};
                 gitlab_rails['db_database'] = '{{ .Values.postgresql.database }}';
                 gitlab_rails['db_username'] = '{{ .Values.postgresql.username }}';
-                gitlab_rails['db_password'] = '{{ .Values.postgresql.password }}';
+                gitlab_rails['db_password'] = "$(POSTGRES_PASSWORD)";
+          envFrom:
+            - secretRef:
+                name: {{ .Values.postgresql.existingSecret }}
           ports:
             - containerPort: 80
           volumeMounts:
