@@ -7,8 +7,8 @@ global:
     port: 5432
     password:
       secret: gitlab-postgres-secret
-      key: postgresql-password
-    username: gitlab
+      key: ChangeMe123!
+    username: dbadmin
 
   # Configure Redis (you can also externalize this if needed)
   redis:
