@@ -4,10 +4,10 @@ metadata:
   name: gitlab-pv
 spec:
   capacity:
-    storage: {{ .Values.storage.size }}
+    storage: "{{ .Values.storage.size }}"  # Ensure this is a string in values.yaml
   accessModes:
-     {{ toYaml .Values.storage.accessModes | indent 2 }}  # Properly handles single or multiple values # Fixed: Now properly formatted as array item
+    {{- toYaml .Values.storage.accessModes | nindent 4 }}  # Ensures correct indentation
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: {{ .Values.storage.storageClassName }}
+  storageClassName: "{{ .Values.storage.storageClassName }}"
   hostPath:
     path: "/mnt/data"
