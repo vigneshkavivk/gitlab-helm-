@@ -1,30 +1,61 @@
-replicaCount: 1
+global:
+  # Disable built-in PostgreSQL
+  postgresql:
+    install: false
+  psql:
+    host: dev-db.cyxw2mqqud77.us-east-1.rds.amazonaws.com
+    port: 5432
+    password:
+      secret: gitlab-postgres-secret
+      key: postgresql-password
+    username: gitlab
 
-image:
-  repository: gitlab/gitlab-ce
-  tag: latest
-  pullPolicy: IfNotPresent
+  # Configure Redis (you can also externalize this if needed)
+  redis:
+    install: true
 
-service:
-  type: ClusterIP
-  port: 80
+  # Configure ingress
+  ingress:
+    configureCertmanager: false
+    enabled: true
+    tls:
+      secretName: gitlab-tls
 
-ingress:
+  # Configure SMTP (adjust as needed)
+  email:
+    from: gitlab@example.com
+    reply_to: noreply@example.com
+    smtp:
+      enabled: true
+      address: smtp.example.com
+      port: 587
+      user_name: gitlab@example.com
+      password:
+        secret: gitlab-smtp-secret
+        key: smtp-password
+      authentication: "login"
+      starttls_auto: true
+
+gitlab:
+  gitlab-shell:
+    enabled: true
+  webservice:
+    enabled: true
+    ingress:
+      tls:
+        secretName: gitlab-tls
+  sidekiq:
+    enabled: true
+  task-runner:
+    enabled: true
+
+# Disable bundled PostgreSQL
+postgresql:
+  install: false
+
+# Persistent volumes for GitLab data
+persistence:
   enabled: true
-  hosts:
-    - gitlab.example.com
-  tls: []
-
-database:
-  host: dev-db.cyxw2mqqud77.us-east-1.rds.amazonaws.com
-  port: 5432
-  user: dbadmin
-  password: ChangeMe123!
-  dbname: mydatabase
-
-storage:
+  storageClass: "gp2"
+  accessMode: ReadWriteOnce
   size: 10Gi
-  accessModes:
-    - ReadWriteOnce  # Now as a list
-  storageClassName: gp2
-
