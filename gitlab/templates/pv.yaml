@@ -4,10 +4,11 @@ metadata:
   name: gitlab-pv
 spec:
   capacity:
-    storage: "{{ .Values.storage.size }}"  # Ensure this is a string in values.yaml
+    storage: 10Gi
   accessModes:
-    {{- toYaml .Values.storage.accessModes | nindent 4 }}  # Ensures correct indentation
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: "{{ .Values.storage.storageClassName }}"
-  hostPath:
-    path: "/mnt/data"
+  storageClassName: gp2
+  awsElasticBlockStore:
+    volumeID: <your-ebs-volume-id>  # Replace with your EBS volume ID
+    fsType: ext4
