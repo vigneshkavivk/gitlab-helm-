@@ -8,7 +8,7 @@ spec:
     matchLabels:
       app: gitlab
   strategy:
-    type: Recreate  # Important for stateful applications like GitLab
+    type: Recreate
   template:
     metadata:
       labels:
@@ -17,7 +17,7 @@ spec:
       initContainers:
         - name: volume-permission-fix
           image: busybox:1.35
-          command: ["sh", "-c", "chown -R 1000:1000 /var/opt/gitlab"]
+          command: ["sh", "-c", "chown -R 1000:1000 /var/opt/gitlab && chmod -R 755 /var/opt/gitlab"]
           volumeMounts:
             - name: gitlab-storage
               mountPath: /var/opt/gitlab
@@ -38,6 +38,7 @@ spec:
                 gitlab_rails['db_database'] = '{{ .Values.database.dbname }}'
                 gitlab_rails['db_adapter'] = 'postgresql'
                 gitlab_rails['db_encoding'] = 'unicode'
+                gitlab_rails['boot_timeout'] = 600  # Increased timeout
           resources:
             requests:
               memory: "2Gi"
@@ -45,18 +46,25 @@ spec:
             limits:
               memory: "4Gi"
               cpu: "1"
+          startupProbe:
+            httpGet:
+              path: /-/readiness
+              port: 80
+            failureThreshold: 30
+            periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /-/health
               port: 80
-            initialDelaySeconds: 300
+            initialDelaySeconds: 600  # Increased for slow starts
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /-/readiness
               port: 80
-            initialDelaySeconds: 30
-            periodSeconds: 5
+            initialDelaySeconds: 120  # Increased initial delay
+            periodSeconds: 10
+            failureThreshold: 12
           volumeMounts:
             - name: gitlab-storage
               mountPath: /var/opt/gitlab
