@@ -26,5 +26,5 @@ storage:
   size: 10Gi
   accessModes:
     - ReadWriteOnce  # Now as a list
-  storageClassName: manual
+  storageClassName: gp2
 
