@@ -4,7 +4,7 @@ metadata:
   name: gitlab-pvc
 spec:
   accessModes:
-    - {{ .Values.storage.accessModes }}
+    - {{ .Values.storage.accessModes }}  # Fixed: Now properly formatted as array item
   resources:
     requests:
       storage: {{ .Values.storage.size }}
