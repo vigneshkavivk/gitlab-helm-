@@ -1,80 +1,33 @@
-# Global GitLab settings
-global:
-  edition: ce
+replicaCount: 1
+
+image:
+  repository: gitlab/gitlab-ce
+  tag: "17.7.2"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
   hosts:
-    domain: example.com
-    https: false
-    gitlab: {}
-    externalIP: ""
-  
-  # PostgreSQL RDS Configuration
-  psql:
-    host: dev-db.cyxw2mqqud77.us-east-1.rds.amazonaws.com
-    port: 5432
-    username: dbadmin
-    password: "ChangeMe123!"  # Will be stored in Secrets
-    database: mydatabase
-    sslmode: require
+    - host: gitlab.example.com
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
 
-  # GitLab Secrets (Generate these with: openssl rand -hex 32)
-  secrets:
-    dbKeyBase: "generated-db-key-base-here"
-    secretKeyBase: "generated-secret-key-base-here"
-    otpKeyBase: "generated-otp-key-base-here"
-
-  # SMTP Configuration (Optional)
-  smtp:
-    enabled: false
-    user: ""
-    password: ""
-    host: ""
-    port: 587
-    domain: ""
-    authentication: "login"
-    starttls_auto: true
-
-# GitLab Rails
-gitlab:
-  rails:
-    replicas: 1
-    image:
-      repository: registry.gitlab.com/gitlab-org/build/cng/gitlab-rails-ce
-      tag: v16.7.0
-      pullPolicy: IfNotPresent
-    resources:
-      requests:
-        memory: "2Gi"
-        cpu: "500m"
-    workhorse:
-      image:
-        repository: registry.gitlab.com/gitlab-org/build/cng/gitlab-workhorse-ce
-        tag: v16.7.0
-
-# Sidekiq
-sidekiq:
-  replicas: 1
-  image:
-    repository: registry.gitlab.com/gitlab-org/build/cng/gitlab-sidekiq-ce
-    tag: v16.7.0
-    pullPolicy: IfNotPresent
-  resources:
-    requests:
-      memory: "1Gi"
-      cpu: "300m"
-
-# Persistence
 persistence:
   enabled: true
-  storageClass: ""
   accessMode: ReadWriteOnce
   size: 10Gi
 
-# Ingress
-ingress:
-  enabled: true
-  className: ""
-  annotations: {}
-  host: gitlab.example.com  # Changed from hosts array to single host
-  path: /
-  pathType: Prefix
-  tls: []
+postgresql:
+  host: dev-db.cyxw2mqqud77.us-east-1.rds.amazonaws.com
+  port: 5432
+  database: mydatabase
+  username: dbadmin
+  password: ChangeMe123!
