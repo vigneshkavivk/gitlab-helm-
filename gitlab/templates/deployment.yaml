@@ -15,7 +15,7 @@ spec:
         app: gitlab
     spec:
       initContainers:
-        - name: volume-permission-fix
+        - name: init
           image: busybox:1.35
           command: ["sh", "-c", "chown -R 1000:1000 /var/opt/gitlab && chmod -R 755 /var/opt/gitlab"]
           volumeMounts:
@@ -38,33 +38,33 @@ spec:
                 gitlab_rails['db_database'] = '{{ .Values.database.dbname }}'
                 gitlab_rails['db_adapter'] = 'postgresql'
                 gitlab_rails['db_encoding'] = 'unicode'
-                gitlab_rails['boot_timeout'] = 600  # Increased timeout
+                gitlab_rails['boot_timeout'] = 1200  # Increased to 20 minutes
+                puma['worker_timeout'] = 600
           resources:
             requests:
-              memory: "2Gi"
-              cpu: "500m"
-            limits:
-              memory: "4Gi"
+              memory: "4Gi"  # Increased minimum
               cpu: "1"
+            limits:
+              memory: "8Gi"
+              cpu: "2"
           startupProbe:
             httpGet:
               path: /-/readiness
               port: 80
-            failureThreshold: 30
-            periodSeconds: 10
+            failureThreshold: 60  # 60 attempts
+            periodSeconds: 10  # 10 minutes total
           livenessProbe:
             httpGet:
               path: /-/health
               port: 80
-            initialDelaySeconds: 600  # Increased for slow starts
+            initialDelaySeconds: 600  # Start checking after 10 minutes
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /-/readiness
               port: 80
-            initialDelaySeconds: 120  # Increased initial delay
+            initialDelaySeconds: 300  # Start checking after 5 minutes
             periodSeconds: 10
-            failureThreshold: 12
           volumeMounts:
             - name: gitlab-storage
               mountPath: /var/opt/gitlab
