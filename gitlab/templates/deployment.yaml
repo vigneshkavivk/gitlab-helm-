@@ -15,15 +15,24 @@ spec:
         app: gitlab
     spec:
       securityContext:
-        fsGroup: 1000  # Ensure GitLab process can access volumes
+        fsGroup: 1000  # Ensures GitLab can access mounted volumes
 
       initContainers:
         - name: init
           image: busybox:1.35
-          command: ["sh", "-c", "chown -R 1000:1000 /var/opt/gitlab && chmod -R 755 /var/opt/gitlab"]
+          command:
+            - "sh"
+            - "-c"
+            - |
+              chown -R 1000:1000 /var/opt/gitlab /etc/gitlab /var/log/gitlab
+              chmod -R 755 /var/opt/gitlab /etc/gitlab /var/log/gitlab
           volumeMounts:
             - name: gitlab-storage
               mountPath: /var/opt/gitlab
+            - name: gitlab-config
+              mountPath: /etc/gitlab
+            - name: gitlab-logs
+              mountPath: /var/log/gitlab
 
       containers:
         - name: gitlab
@@ -48,33 +57,38 @@ spec:
                 puma['worker_timeout'] = 600
           resources:
             requests:
-              memory: "4Gi"  # Increased minimum
+              memory: "4Gi"
               cpu: "1"
             limits:
               memory: "8Gi"
               cpu: "2"
-          #startupProbe:
-            #httpGet:
-              #path: /-/readiness
-              #port: 80
-            #failureThreshold: 60  # 60 attempts
-            #periodSeconds: 10  # 10 minutes total
           livenessProbe:
             httpGet:
               path: /-/health
               port: 80
-            initialDelaySeconds: 600  # Start checking after 10 minutes
+            initialDelaySeconds: 600
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /-/readiness
               port: 80
-            initialDelaySeconds: 300  # Start checking after 5 minutes
+            initialDelaySeconds: 300
             periodSeconds: 10
           volumeMounts:
             - name: gitlab-storage
               mountPath: /var/opt/gitlab
+            - name: gitlab-config
+              mountPath: /etc/gitlab
+            - name: gitlab-logs
+              mountPath: /var/log/gitlab
+
       volumes:
         - name: gitlab-storage
           persistentVolumeClaim:
             claimName: gitlab-pvc
+        - name: gitlab-config
+          persistentVolumeClaim:
+            claimName: gitlab-config-pvc
+        - name: gitlab-logs
+          persistentVolumeClaim:
+            claimName: gitlab-logs-pvc
