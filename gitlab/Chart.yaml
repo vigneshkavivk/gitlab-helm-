@@ -6,5 +6,5 @@ appVersion: 15.0.0
 dependencies:
 - name: gitlab
   version: "6.9.1"
-  repository: "https://charts.gitlab.io"
+  
   condition: gitlab.enabled
