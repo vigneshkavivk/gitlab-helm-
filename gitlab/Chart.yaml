@@ -1,0 +1,5 @@
+apiVersion: v2
+name: gitlab
+version: 0.1.0
+description: GitLab Helm Chart without inbuilt PostgreSQL
+dependencies: []

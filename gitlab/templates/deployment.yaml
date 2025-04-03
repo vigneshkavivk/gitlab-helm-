@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: gitlab
+  template:
+    metadata:
+      labels:
+        app: gitlab
+    spec:
+      containers:
+        - name: gitlab
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          ports:
+            - containerPort: 80
+          env:
+            - name: GITLAB_OMNIBUS_CONFIG
+              value: |
+                external_url 'http://{{ .Values.ingress.hosts }}'
+                gitlab_rails['db_host'] = '{{ .Values.database.host }}'
+                gitlab_rails['db_port'] = {{ .Values.database.port }}
+                gitlab_rails['db_username'] = '{{ .Values.database.user }}'
+                gitlab_rails['db_password'] = '{{ .Values.database.password }}'
+                gitlab_rails['db_database'] = '{{ .Values.database.dbname }}'
+          volumeMounts:
+            - name: gitlab-storage
+              mountPath: /var/opt/gitlab
+      volumes:
+        - name: gitlab-storage
+          persistentVolumeClaim:
+            claimName: gitlab-pvc

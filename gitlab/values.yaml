@@ -1,0 +1,30 @@
+replicaCount: 1
+
+image:
+  repository: gitlab/gitlab-ce
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  hosts:
+    - gitlab.example.com
+  tls: []
+
+database:
+  host: dev-db.cyxw2mqqud77.us-east-1.rds.amazonaws.com
+  port: 5432
+  user: dbadmin
+  password: ChangeMe123!
+  dbname: mydatabase
+
+storage:
+  size: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: gp2
+
