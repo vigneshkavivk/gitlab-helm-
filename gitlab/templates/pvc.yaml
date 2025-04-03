@@ -4,7 +4,7 @@ metadata:
   name: gitlab-pvc
 spec:
   accessModes:
-    - {{ .Values.storage.accessModes }}  # Fixed: Now properly formatted as array item
+    {{ toYaml .Values.storage.accessModes | indent 2 }}  # Properly handles single or multiple values  
   resources:
     requests:
       storage: {{ .Values.storage.size }}
