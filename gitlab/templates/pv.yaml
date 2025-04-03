@@ -1,15 +1,13 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .Chart.Name }}-pv
-  labels:
-    app: {{ .Chart.Name }}
+  name: gitlab-pv
 spec:
   capacity:
-    storage: {{ .Values.persistence.size }}
+    storage: 10Gi
   accessModes:
-    - {{ .Values.persistence.accessMode }}
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: {{ .Values.persistence.storageClass | default "" }}
+  storageClassName: standard
   hostPath:
-    path: /data/{{ .Chart.Name }}
+    path: /mnt/data/gitlab
