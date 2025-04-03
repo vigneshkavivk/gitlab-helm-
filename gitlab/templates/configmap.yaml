@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitlab-config
+data:
+  GITLAB_OMNIBUS_CONFIG: |
+    external_url 'https://gitlab.example.com'
+    gitlab_rails['db_adapter'] = 'postgresql'
+    gitlab_rails['db_encoding'] = 'unicode'
+    gitlab_rails['db_host'] = 'dev-db.cyxw2mqqud77.us-east-1.rds.amazonaws.com'
+    gitlab_rails['db_port'] = '5432'
+    gitlab_rails['db_database'] = 'mydatabase'
+    gitlab_rails['db_username'] = 'dbadmin'
+    gitlab_rails['time_zone'] = 'UTC'
+    gitlab_rails['gitlab_shell_ssh_port'] = 22
+    nginx['listen_port'] = 80
+    nginx['listen_https'] = false
