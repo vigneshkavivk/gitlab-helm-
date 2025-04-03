@@ -14,6 +14,9 @@ spec:
       labels:
         app: gitlab
     spec:
+      securityContext:
+        fsGroup: 1000  # Ensure GitLab process can access volumes
+
       initContainers:
         - name: init
           image: busybox:1.35
@@ -21,10 +24,13 @@ spec:
           volumeMounts:
             - name: gitlab-storage
               mountPath: /var/opt/gitlab
-      
+
       containers:
         - name: gitlab
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
           ports:
             - containerPort: 80
           env:
