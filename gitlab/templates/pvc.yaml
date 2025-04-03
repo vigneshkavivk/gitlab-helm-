@@ -4,7 +4,7 @@ metadata:
   name: gitlab-pvc
 spec:
   accessModes:
-    - {{ .Values.storage.accessModes[0] }}
+    - {{ .Values.storage.accessModes }}
   resources:
     requests:
       storage: {{ .Values.storage.size }}
