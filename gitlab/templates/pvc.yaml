@@ -4,8 +4,8 @@ metadata:
   name: gitlab-pvc
 spec:
   accessModes:
-    {{ toYaml .Values.storage.accessModes | indent 2 }}  # Properly handles single or multiple values  
+    - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.storage.size }}
-  storageClassName: {{ .Values.storage.storageClassName }}
+      storage: 10Gi
+  storageClassName: gp2
