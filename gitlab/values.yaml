@@ -1,61 +1,82 @@
+# Global GitLab settings
 global:
-  # Disable built-in PostgreSQL
-  postgresql:
-    install: false
+  edition: ce
+  hosts:
+    domain: example.com
+    https: false
+    gitlab: {}
+    externalIP: ""
+  
+  # PostgreSQL RDS Configuration
   psql:
     host: dev-db.cyxw2mqqud77.us-east-1.rds.amazonaws.com
     port: 5432
-    password:
-      secret: gitlab-postgres-secret
-      key: ChangeMe123!
     username: dbadmin
+    password: "ChangeMe123!"  # Will be stored in Secrets
+    database: mydatabase
+    sslmode: require
 
-  # Configure Redis (you can also externalize this if needed)
-  redis:
-    install: true
+  # GitLab Secrets (Generate these with: openssl rand -hex 32)
+  secrets:
+    dbKeyBase: "generated-db-key-base-here"
+    secretKeyBase: "generated-secret-key-base-here"
+    otpKeyBase: "generated-otp-key-base-here"
 
-  # Configure ingress
-  ingress:
-    configureCertmanager: false
-    enabled: true
-    tls:
-      secretName: gitlab-tls
+  # SMTP Configuration (Optional)
+  smtp:
+    enabled: false
+    user: ""
+    password: ""
+    host: ""
+    port: 587
+    domain: ""
+    authentication: "login"
+    starttls_auto: true
 
-  # Configure SMTP (adjust as needed)
-  email:
-    from: gitlab@example.com
-    reply_to: noreply@example.com
-    smtp:
-      enabled: true
-      address: smtp.example.com
-      port: 587
-      user_name: gitlab@example.com
-      password:
-        secret: gitlab-smtp-secret
-        key: smtp-password
-      authentication: "login"
-      starttls_auto: true
-
+# GitLab Rails
 gitlab:
-  gitlab-shell:
-    enabled: true
-  webservice:
-    enabled: true
-    ingress:
-      tls:
-        secretName: gitlab-tls
-  sidekiq:
-    enabled: true
-  task-runner:
-    enabled: true
+  rails:
+    replicas: 1
+    image:
+      repository: registry.gitlab.com/gitlab-org/build/cng/gitlab-rails-ce
+      tag: v16.7.0
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "500m"
+    workhorse:
+      image:
+        repository: registry.gitlab.com/gitlab-org/build/cng/gitlab-workhorse-ce
+        tag: v16.7.0
 
-# Disable bundled PostgreSQL
-postgresql:
-  install: false
+# Sidekiq
+sidekiq:
+  replicas: 1
+  image:
+    repository: registry.gitlab.com/gitlab-org/build/cng/gitlab-sidekiq-ce
+    tag: v16.7.0
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "300m"
 
-# Persistent volumes for GitLab data
+# Persistence
 persistence:
   enabled: true
-  storageClass: "gp2"
+  storageClass: ""
   accessMode: ReadWriteOnce
   size: 10Gi
+
+# Ingress
+ingress:
+  enabled: true
+  className: ""
+  annotations: {}
+  hosts:
+    - host: gitlab.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
