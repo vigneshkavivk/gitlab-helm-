@@ -7,11 +7,21 @@ spec:
   selector:
     matchLabels:
       app: gitlab
+  strategy:
+    type: Recreate  # Important for stateful applications like GitLab
   template:
     metadata:
       labels:
         app: gitlab
     spec:
+      initContainers:
+        - name: volume-permission-fix
+          image: busybox:1.35
+          command: ["sh", "-c", "chown -R 1000:1000 /var/opt/gitlab"]
+          volumeMounts:
+            - name: gitlab-storage
+              mountPath: /var/opt/gitlab
+      
       containers:
         - name: gitlab
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -20,12 +30,33 @@ spec:
           env:
             - name: GITLAB_OMNIBUS_CONFIG
               value: |
-                external_url 'http://{{ .Values.ingress.hosts }}'
+                external_url 'http://{{ first .Values.ingress.hosts }}'
                 gitlab_rails['db_host'] = '{{ .Values.database.host }}'
                 gitlab_rails['db_port'] = {{ .Values.database.port }}
                 gitlab_rails['db_username'] = '{{ .Values.database.user }}'
                 gitlab_rails['db_password'] = '{{ .Values.database.password }}'
                 gitlab_rails['db_database'] = '{{ .Values.database.dbname }}'
+                gitlab_rails['db_adapter'] = 'postgresql'
+                gitlab_rails['db_encoding'] = 'unicode'
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "500m"
+            limits:
+              memory: "4Gi"
+              cpu: "1"
+          livenessProbe:
+            httpGet:
+              path: /-/health
+              port: 80
+            initialDelaySeconds: 300
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /-/readiness
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 5
           volumeMounts:
             - name: gitlab-storage
               mountPath: /var/opt/gitlab
