@@ -25,6 +25,6 @@ database:
 storage:
   size: 10Gi
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteOnce  # Now as a list
   storageClassName: gp2
 
