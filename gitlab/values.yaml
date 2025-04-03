@@ -2,8 +2,9 @@ replicaCount: 1
 
 image:
   repository: gitlab/gitlab-ce
-  tag: "17.7.2"
+  tag: "17.10.1"
   pullPolicy: IfNotPresent
+
 
 service:
   type: ClusterIP
