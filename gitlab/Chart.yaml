@@ -1,10 +1,5 @@
 apiVersion: v2
-name: gitlab-external-postgresql
-description: GitLab with external PostgreSQL (AWS RDS)
-version: 0.1.0
-appVersion: 15.0.0
-dependencies:
-- name: gitlab
-  version: "6.9.1"
-  
-  condition: gitlab.enabled
+name: gitlab-custom
+description: A custom Helm chart for GitLab with external PostgreSQL RDS
+version: 1.0.0
+appVersion: "16.7.0"
