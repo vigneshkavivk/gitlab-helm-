@@ -6,7 +6,7 @@ spec:
   capacity:
     storage: {{ .Values.storage.size }}
   accessModes:
-    - {{ .Values.storage.accessModes[0] }}
+    - {{ .Values.storage.accessModes }}  # Fixed: Now properly formatted as array item
   persistentVolumeReclaimPolicy: Retain
   storageClassName: {{ .Values.storage.storageClassName }}
   hostPath:
