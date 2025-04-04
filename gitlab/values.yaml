@@ -5,8 +5,6 @@ image:
   tag: "17.7.2-ce.0"
   pullPolicy: IfNotPresent
 
-
-
 service:
   type: ClusterIP
   port: 80
@@ -28,9 +26,25 @@ persistence:
   size: 10Gi
 
 postgresql:
+  enabled: false  # disables inbuilt PostgreSQL
   host: dev-db.cyxw2mqqud77.us-east-1.rds.amazonaws.com
   port: 5432
-  database: mydatabase
-  username: dbadmin
+  database: gitlab        # ✅ recommend using `gitlab` DB (not mydatabase)
+  username: gitlab        # ✅ use matching user
   existingSecret: gitlab-secret
-  secretKey: ChangeMe123!
+  existingSecretPasswordKey: POSTGRES_PASSWORD
+
+env:
+  POSTGRES_DB: gitlab
+  POSTGRES_USER: gitlab
+  POSTGRES_PASSWORD: Muruga@1
+  POSTGRES_HOST: dev-db.cyxw2mqqud77.us-east-1.rds.amazonaws.com
+
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
+  limits:
+    memory: "2Gi"
+    cpu: "1"
+
