@@ -42,9 +42,9 @@ env:
 
 resources:
   requests:
-    memory: "1Gi"
-    cpu: "500m"
+    memory: "4Gi"
+    cpu: "2"
   limits:
-    memory: "2Gi"
-    cpu: "1"
+    memory: "6Gi"
+    cpu: "3"
 
