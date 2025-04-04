@@ -37,7 +37,7 @@ postgresql:
 env:
   POSTGRES_DB: mydatabase
   POSTGRES_USER: dbadmin
-  POSTGRES_PASSWORD: Muruga@1
+  POSTGRES_PASSWORD: ChangeMe123!
   POSTGRES_HOST: dev-db.cyxw2mqqud77.us-east-1.rds.amazonaws.com
 
 resources:
