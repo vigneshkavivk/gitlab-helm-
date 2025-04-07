@@ -10,7 +10,7 @@ spec:
         spec:
           containers:
             - name: gitlab-backup
-              image: <gitlab-image>  # Replace with your GitLab container image
+              image: gitlab-5dbf5797c9-lttkb  # Replace with your GitLab container image
               command:
                 - "/bin/bash"
                 - "-c"
