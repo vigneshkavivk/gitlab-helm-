@@ -1,17 +1,25 @@
-apiVersion: v1
-kind: Pod
+apiVersion: batch/v1
+kind: CronJob
 metadata:
-  name: pvc-debug
-  namespace: rds-git
+  name: gitlab-backup
 spec:
-  containers:
-  - name: debug-container
-    image: busybox
-    command: [ "sleep", "3600" ]
-    volumeMounts:
-    - mountPath: /mnt
-      name: pvc
-  volumes:
-  - name: pvc
-    persistentVolumeClaim:
-      claimName: gitlab-pvc
+  schedule: "0 0 * * *"  # Schedule at midnight
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: gitlab-backup
+              image: <gitlab-image>  # Replace with your GitLab container image
+              command:
+                - "/bin/bash"
+                - "-c"
+                - "gitlab-rake gitlab:backup:create"
+              volumeMounts:
+                - mountPath: /var/opt/gitlab/backups
+                  name: gitlab-backup-volume
+          restartPolicy: OnFailure
+          volumes:
+            - name: gitlab-backup-volume
+              persistentVolumeClaim:
+                claimName: gitlab-backup-pvc
