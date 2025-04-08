@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: gitlab-backup-job
+  namespace: rds-git
+spec:
+  schedule: "0 */3 * * *"  # Every 3 hours
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: gitlab-backup
+              image: gitlab/gitlab-ce:17.7.2-ce.0
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  echo "Starting GitLab Backup..."
+                  gitlab-backup create
+                  echo "Cleaning up old backups older than 24 hours..."
+                  find /var/opt/gitlab/backups -type f -mmin +1440 -name "*.tar" -exec rm -f {} \;
+              volumeMounts:
+                - name: gitlab-storage
+                  mountPath: /var/opt/gitlab
+                - name: gitlab-backup-volume
+                  mountPath: /var/opt/gitlab/backups
+          volumes:
+            - name: gitlab-storage
+              persistentVolumeClaim:
+                claimName: gitlab-pvc
+            - name: gitlab-backup-volume
+              persistentVolumeClaim:
+                claimName: gitlab-backup-pvc
+          restartPolicy: OnFailure
