@@ -11,5 +11,5 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: manual
   hostPath:
-    path: "/var/opt/gitlab/backups"  # this is on the node
+    path: "/mnt/gitlab-backup"  # this is on the node
     type: DirectoryOrCreate
