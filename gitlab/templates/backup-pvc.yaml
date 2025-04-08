@@ -1,9 +1,8 @@
-# gitlab-backup-pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: gitlab-backup-pvc
-  namespace: rds-git
+  namespace: git-rds
 spec:
   accessModes:
     - ReadWriteOnce
