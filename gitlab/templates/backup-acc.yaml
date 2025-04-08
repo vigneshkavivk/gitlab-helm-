@@ -4,6 +4,7 @@ metadata:
   name: backup-accessor
   namespace: rds-git
 spec:
+  restartPolicy: Never
   containers:
   - name: busybox
     image: busybox
