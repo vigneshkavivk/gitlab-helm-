@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backup-reader
-  namespace: git-rds
+  namespace: rds-git
 spec:
   replicas: 1
   selector:
