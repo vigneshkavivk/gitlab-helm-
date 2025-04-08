@@ -10,4 +10,4 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: manual
   hostPath:
-    path: /mnt/gitlab-backups  # Change this path based on your cluster nodes
+    path: /var/opt/gitlab/backups  # Change this path based on your cluster nodes
