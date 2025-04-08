@@ -1,4 +1,3 @@
-# gitlab-backup-pv.yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -9,7 +8,6 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: manual
+  storageClassName: gitlab-backup
   hostPath:
-    path: "/var/opt/gitlab/backups"  # this is on the node
-    type: DirectoryOrCreate
+    path: /mnt/data/gitlab-backups
