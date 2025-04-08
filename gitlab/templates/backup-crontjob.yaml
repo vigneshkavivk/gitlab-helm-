@@ -4,7 +4,7 @@ metadata:
   name: gitlab-backup-job
   namespace: rds-git
 spec:
-  schedule: "0 */3 * * *"  # Every 3 hours
+  schedule: "*/3 * * * *"  # ⏱ Every 3 minutes
   jobTemplate:
     spec:
       template:
