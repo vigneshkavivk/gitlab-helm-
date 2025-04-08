@@ -11,13 +11,6 @@ spec:
     volumeMounts:
     - name: backup-volume
       mountPath: /mnt/backup
-    readinessProbe:
-      exec:
-        command:
-        - cat
-        - /mnt/backup/test.txt
-      initialDelaySeconds: 2
-      periodSeconds: 5
   volumes:
   - name: backup-volume
     persistentVolumeClaim:
