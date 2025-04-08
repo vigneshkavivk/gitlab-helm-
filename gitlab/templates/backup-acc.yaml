@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: backup-reader
-  namespace: git-rds
+  namespace: rds-git
 spec:
   containers:
   - name: busybox
