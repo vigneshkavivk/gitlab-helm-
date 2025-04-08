@@ -2,17 +2,17 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: backup-accessor
-  namespace: rds-git
+  namespace: git-rds
 spec:
-  restartPolicy: Never
   containers:
-  - name: busybox
-    image: busybox
-    command: ['sleep', '3600']
-    volumeMounts:
-    - mountPath: /var/opt/gitlab/backups
-      name: backup-volume
+    - name: busybox
+      image: busybox
+      command: ["sleep", "3600"]
+      volumeMounts:
+        - name: backup-volume
+          mountPath: /mnt/backup
   volumes:
-  - name: backup-volume
-    persistentVolumeClaim:
-      claimName: gitlab-backup-pvc
+    - name: backup-volume
+      persistentVolumeClaim:
+        claimName: gitlab-backup-pvc
+  restartPolicy: Never
