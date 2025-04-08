@@ -2,24 +2,21 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: gitlab-backup
+  namespace: rds-git
 spec:
-  schedule: "0 0 * * *"  # Schedule at midnight
+  schedule: "0 1 * * *"  # Every day at 1 AM
   jobTemplate:
     spec:
       template:
         spec:
+          serviceAccountName: gitlab-backup-sa
           containers:
-            - name: gitlab-backup
-              image: gitlab/gitlab-ce:17.7.2-ce.0  # Replace with your GitLab container image
+            - name: backup-runner
+              image: bitnami/kubectl:latest
               command:
-                - "/bin/bash"
-                - "-c"
-                - "gitlab-rake gitlab:backup:create"
-              volumeMounts:
-                - mountPath: /var/opt/gitlab/backups
-                  name: gitlab-backup-volume
+                - /bin/sh
+                - -c
+                - |
+                  POD=$(kubectl get pod -n rds-git -l app=gitlab -o jsonpath="{.items[0].metadata.name}")
+                  kubectl exec -n rds-git $POD -- gitlab-rake gitlab:backup:create
           restartPolicy: OnFailure
-          volumes:
-            - name: gitlab-backup-volume
-              persistentVolumeClaim:
-                claimName: gitlab-backup-pvc
