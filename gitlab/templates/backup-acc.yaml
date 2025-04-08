@@ -5,14 +5,21 @@ metadata:
   namespace: git-rds
 spec:
   containers:
-    - name: busybox
-      image: busybox
-      command: ["sleep", "3600"]
-      volumeMounts:
-        - name: backup-volume
-          mountPath: /mnt/backup
-  volumes:
+  - name: busybox
+    image: busybox
+    command: ['sh', '-c', 'sleep 3600']
+    volumeMounts:
     - name: backup-volume
-      persistentVolumeClaim:
-        claimName: gitlab-backup-pvc
-  restartPolicy: Never
+      mountPath: /mnt/backup
+    readinessProbe:
+      exec:
+        command:
+        - cat
+        - /mnt/backup/test.txt
+      initialDelaySeconds: 2
+      periodSeconds: 5
+  volumes:
+  - name: backup-volume
+    persistentVolumeClaim:
+      claimName: gitlab-backup-pvc
+  restartPolicy: Always
