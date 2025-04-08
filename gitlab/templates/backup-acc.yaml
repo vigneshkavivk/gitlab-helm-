@@ -18,9 +18,9 @@ spec:
           image: busybox
           command: ["sleep", "infinity"]
           volumeMounts:
-            - name: backup-volume
+            - name: gitlab-backup-volume
               mountPath: /mnt/backup
       volumes:
-        - name: backup-volume
+        - name: gitlab-backup-volume
           persistentVolumeClaim:
             claimName: gitlab-backup-pvc
