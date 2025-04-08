@@ -9,5 +9,5 @@ spec:
     - ReadWriteOnce
   storageClassName: manual
   hostPath:
-  path: /mnt/gitlab-backups
+  path: /var/opt/gitlab/backups
 
