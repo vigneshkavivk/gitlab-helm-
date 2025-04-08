@@ -1,12 +1,12 @@
 apiVersion: v1
-kind: PersistentVolume
+kind: PersistentVolumeClaim
 metadata:
-  name: gitlab-backup-pv
+  name: gitlab-backup-pvc
+  namespace: rds-git
 spec:
-  capacity:
-    storage: 5Gi
   accessModes:
     - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
   storageClassName: manual
-  hostPath:
-    path: /var/opt/gitlab/backups
