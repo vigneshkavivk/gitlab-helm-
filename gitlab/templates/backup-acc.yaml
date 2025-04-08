@@ -5,14 +5,13 @@ metadata:
   namespace: rds-git
 spec:
   containers:
-  - name: busybox
-    image: busybox
+  - name: backup-reader
+    image: alpine
     command: ["sleep", "3600"]
     volumeMounts:
-    - name: backup-volume
-      mountPath: /mnt/backup
+    - mountPath: /mnt/backup
+      name: backup-volume
   volumes:
   - name: backup-volume
     persistentVolumeClaim:
       claimName: gitlab-backup-pvc
-  restartPolicy: Never
