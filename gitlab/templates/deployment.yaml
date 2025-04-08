@@ -33,7 +33,12 @@ spec:
           volumeMounts:
             - mountPath: /var/opt/gitlab
               name: gitlab-storage
+            - mountPath: /var/opt/gitlab/backups
+              name: gitlab-backup-volume
       volumes:
         - name: gitlab-storage
           persistentVolumeClaim:
             claimName: gitlab-pvc
+        - name: gitlab-backup-volume
+          persistentVolumeClaim:
+            claimName: gitlab-backup-pvc
