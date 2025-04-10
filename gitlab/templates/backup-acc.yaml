@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: backup-reader
-          image: busybox
-          command: ["sleep", "infinity"]
+          image: alpine
+          command: ["/bin/sh", "-c", "sleep infinity"]
           volumeMounts:
             - name: gitlab-backup-volume
               mountPath: /mnt/backup
