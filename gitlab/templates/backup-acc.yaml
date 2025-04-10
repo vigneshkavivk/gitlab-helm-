@@ -20,8 +20,6 @@ spec:
           volumeMounts:
             - name: gitlab-backup-volume
               mountPath: /mnt/backup
-              # Optional: Only if GitLab is using subPath
-              subPath: backups
       volumes:
         - name: gitlab-backup-volume
           persistentVolumeClaim:
