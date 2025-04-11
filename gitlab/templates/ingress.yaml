@@ -15,7 +15,7 @@ spec:
         - cloudmasa.gitlab.com
       secretName: gitlab-tls-secret
   rules:
-    - host: cloudmasa.gitlab.com
+    - host: gitlab.cloudmasa.com
       http:
         paths:
           - path: /
