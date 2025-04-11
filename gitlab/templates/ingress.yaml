@@ -18,7 +18,7 @@ spec:
             path: "/"
             backend:
               service:
-                name: echo1
+                name: gitlab-service
                 port:
                   number: 80
     
