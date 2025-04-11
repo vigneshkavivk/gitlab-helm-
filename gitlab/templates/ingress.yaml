@@ -4,13 +4,10 @@ metadata:
   name: gitlab-ingress
   namespace: rds-git
   annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-staging
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+    acme.cert-manager.io/http01-edit-in-place: "true"
 spec:
-  tls:
-    - hosts:
-        - gitlab.cloudmasa.com
-      secretName: echo-tls
   rules:
     - host: gitlab.cloudmasa.com
       http:
@@ -19,6 +16,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: gitlab
+                name: gitlab-service
                 port:
                   number: 80
