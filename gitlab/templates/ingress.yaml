@@ -12,7 +12,7 @@ metadata:
 spec:
   tls:
     - hosts:
-        - cloudmasa.gitlab.com
+        - gitlab.cloudmasa.com
       secretName: gitlab-tls-secret
   rules:
     - host: gitlab.cloudmasa.com
