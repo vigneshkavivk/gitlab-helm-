@@ -18,10 +18,10 @@ spec:
   - host: gitlab.cloudmasa.com
     http:
       paths:
-      - path: /
+      - path: /.well-known/acme-challenge/
         pathType: Prefix
         backend:
           service:
-            name: gitlab-service   # 🔁 Replace with your GitLab service name
+            name: gitlab-service   #  Replace with your GitLab service name
             port:
-              number: 80
+              number: 8089
