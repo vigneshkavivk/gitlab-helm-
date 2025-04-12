@@ -1,12 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "gitlab.fullname" . }}
+  name: gitlab
   labels:
-    app: {{ include "gitlab.name" . }}
-    chart: {{ include "gitlab.chart" . }}
+    app: gitlab
     release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -15,5 +13,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: {{ include "gitlab.name" . }}
+    app: gitlab
     release: {{ .Release.Name }}
