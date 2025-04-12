@@ -5,6 +5,10 @@ metadata:
   labels:
     app: gitlab
     release: {{ .Release.Name }}
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb" # NLB for AWS
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-eip-allocations: "eipalloc-0da07b44ed2027198,eipalloc-074dfdb99de345bbf"
 spec:
   type: {{ .Values.service.type }}
   ports:
