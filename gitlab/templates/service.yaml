@@ -4,7 +4,7 @@ metadata:
   name: gitlab
   labels:
     app: gitlab
-    release: {{ .Release.Name }}
+    release: gitlab
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-type: "nlb" # NLB for AWS
     service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
@@ -18,4 +18,4 @@ spec:
       name: http
   selector:
     app: gitlab
-    release: {{ .Release.Name }}
+    release: gitlab
